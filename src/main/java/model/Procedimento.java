@@ -1,3 +1,4 @@
+package model;
 public interface Procedimento {
 	public abstract float getValor();
 	public abstract String getTipo(); 

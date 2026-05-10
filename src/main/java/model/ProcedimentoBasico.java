@@ -1,3 +1,4 @@
+package model;
 public class ProcedimentoBasico implements Procedimento {
     @Override
     public float getValor() {

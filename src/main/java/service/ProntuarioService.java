@@ -1,3 +1,5 @@
+package service;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,47 +9,25 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Prontuario {
+import model.Internacao;
+import model.Procedimento;
+import model.Prontuario;
+import model.TipoLeito;
+import factory.ProcedimentoFactory;
 
-	private String nomePaciente;
-	private Internacao internacao;
-	private List<Procedimento> procedimentos = new ArrayList<>();
+public class ProntuarioService {
+
 	private ProcedimentoFactory procedimentoFactory = new ProcedimentoFactory();
 
-	public Prontuario(String nomePaciente) {
-		this.nomePaciente = nomePaciente;
-	}
-
-	public void setNomePaciente(String nomePaciente) {
-		this.nomePaciente = nomePaciente;
-	}
-
-	public String getNomePaciente() {
-		return this.nomePaciente;
-	}
-
-	public void setInternacao(Internacao internacao) {
-		this.internacao = internacao;
-	}
-
-	public Internacao getInternacao() {
-		return this.internacao;
-	}
-
-	public void addProcedimento(Procedimento procedimento) {
-		this.procedimentos.add(procedimento);
-	}
-
-	public List<Procedimento> getProcedimentos() {
-		return this.procedimentos;
-	}
-
-	public String imprimaConta() {
+	public String imprimaConta(Prontuario prontuario) {
 		NumberFormat formatter = NumberFormat.getCurrencyInstance();
 
 		String conta = "----------------------------------------------------------------------------------------------";
 
 		float valorDiarias = 0.0f;
+		Internacao internacao = prontuario.getInternacao();
+		List<Procedimento> procedimentos = prontuario.getProcedimentos();
+		String nomePaciente = prontuario.getNomePaciente();
 
 		// Contabilizar as diárias
 		// ==== utilizar polimorfimos aqui
@@ -185,8 +165,6 @@ public class Prontuario {
 		return conta;
 	}
 
-	boolean b = false;
-
 	// ==== DEVE FICAR EM UMA CLASSE DE REPOSITORIO
 	public Prontuario carregueProntuario(String arquivoCsv) throws IOException {
 		Prontuario prontuario = new Prontuario(null);
@@ -198,9 +176,12 @@ public class Prontuario {
 		// Files.lines(path) instrui a Stream ler o arquivo linha por linha
 		Stream<String> linhas = Files.lines(path);
 
+		// Auxiliar para pular o cabeçalho
+		final boolean[] isHeader = {true};
+
 		linhas.forEach((str) -> {
-			if (b == false) {
-				b = true;
+			if (isHeader[0]) {
+				isHeader[0] = false;
 			} else {
 				System.out.println(str);
 
@@ -216,10 +197,10 @@ public class Prontuario {
 
 				int qtdeProcedimentos = dados.length == 5 && dados[4] != null && !dados[4].trim().isEmpty() ? Integer.parseInt(dados[4].trim()) : -1;
 
-				prontuario.nomePaciente = nomePaciente;
+				prontuario.setNomePaciente(nomePaciente);
 
 				if (tipoLeito != null && qtdeDiasInternacao > 0) {
-					prontuario.internacao = new Internacao(tipoLeito, qtdeDiasInternacao);
+					prontuario.setInternacao(new Internacao(tipoLeito, qtdeDiasInternacao));
 				}
 
 				if (tipoProcedimento != null && qtdeProcedimentos > 0) {
@@ -235,17 +216,19 @@ public class Prontuario {
 	}
 
 	// ==== DEVE FICAR EM UMA CLASSE DE REPOSITORIO
-	List<String> l = new ArrayList<>();
+	public String salveProntuario(Prontuario prontuario) throws IOException {
+		List<String> lines = new ArrayList<>();
+		String nomePaciente = prontuario.getNomePaciente();
+		Internacao internacao = prontuario.getInternacao();
+		List<Procedimento> procedimentos = prontuario.getProcedimentos();
 
-	public String salveProntuario() throws IOException {
-
-		l.add("nome_paciente,tipo_leito,qtde_dias_internacao,tipo_procedimento,qtde_procedimentos");
+		lines.add("nome_paciente,tipo_leito,qtde_dias_internacao,tipo_procedimento,qtde_procedimentos");
 
 		String l1 = nomePaciente + ",";
 
 		if (internacao != null) {
 			l1 += internacao.getTipoLeito() + "," + internacao.getQtdeDias() + ",,";
-			l.add(l1);
+			lines.add(l1);
 		}
 
 		if (procedimentos.size() > 0) {
@@ -257,18 +240,18 @@ public class Prontuario {
 
 			for (String chave : procedimentosOrdenados) {
 				String l2 = nomePaciente + ",,," + chave + "," + procedimentosAgrupados.get(chave);
-				l.add(l2);
+				lines.add(l2);
 			}
 		}
 
-		if (l.size() == 1) {
+		if (lines.size() == 1) {
 			l1 += ",,,";
-			l.add(l1);
+			lines.add(l1);
 		}
 
 		Path path = Paths.get(nomePaciente.replaceAll(" ", "_").concat(String.valueOf(System.currentTimeMillis())).concat(".csv"));
 
-		Files.write(path, l);
+		Files.write(path, lines);
 
 		return path.toString();
 	}

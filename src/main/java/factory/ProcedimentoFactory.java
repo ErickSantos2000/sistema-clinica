@@ -1,3 +1,10 @@
+package factory;
+
+import model.Procedimento;
+import model.ProcedimentoAvancado;
+import model.ProcedimentoBasico;
+import model.ProcedimentoComum;
+
 public class ProcedimentoFactory {
 	public Procedimento criaProcedimento(String tipo){
 		if(tipo.equalsIgnoreCase("BASICO")){

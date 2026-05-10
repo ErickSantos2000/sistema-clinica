@@ -1,5 +1,15 @@
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+
+import model.Internacao;
+import model.Procedimento;
+import model.ProcedimentoAvancado;
+import model.ProcedimentoBasico;
+import model.ProcedimentoComum;
+import model.Prontuario;
+import model.TipoLeito;
+import service.ProntuarioService;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -12,6 +22,13 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 
 public class ProntuarioTest {
+
+	private ProntuarioService service;
+
+	@Before
+	public void setUp() {
+		service = new ProntuarioService();
+	}
 
 	@After
 	public void cleanUp() {
@@ -54,7 +71,7 @@ public class ProntuarioTest {
 				"\nVolte sempre, a casa é sua!" +
 				"\n----------------------------------------------------------------------------------------------";
 
-		assertEquals(respostaEsperada, prontuario.imprimaConta());
+		assertEquals(respostaEsperada, service.imprimaConta(prontuario));
 	}
 
 	@Test
@@ -83,7 +100,7 @@ public class ProntuarioTest {
 				"\nVolte sempre, a casa é sua!" +
 				"\n----------------------------------------------------------------------------------------------";
 
-		assertEquals(respostaEsperada, prontuario.imprimaConta());
+		assertEquals(respostaEsperada, service.imprimaConta(prontuario));
 	}
 
 	@Test
@@ -102,7 +119,7 @@ public class ProntuarioTest {
 				"\nVolte sempre, a casa é sua!" +
 				"\n----------------------------------------------------------------------------------------------";
 
-		assertEquals(respostaEsperada, prontuario.imprimaConta());
+		assertEquals(respostaEsperada, service.imprimaConta(prontuario));
 	}
 
 	@Test
@@ -112,7 +129,7 @@ public class ProntuarioTest {
 		Prontuario prontuario = null;
 
 		try {
-			prontuario = new Prontuario(null).carregueProntuario(path);
+			prontuario = service.carregueProntuario(path);
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
@@ -135,7 +152,7 @@ public class ProntuarioTest {
 		Prontuario prontuario = null;
 
 		try {
-			prontuario = new Prontuario(null).carregueProntuario(path);
+			prontuario = service.carregueProntuario(path);
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 			fail(ioException.getMessage());
@@ -155,7 +172,7 @@ public class ProntuarioTest {
 		Prontuario prontuario = null;
 
 		try {
-			prontuario = new Prontuario(null).carregueProntuario(path);
+			prontuario = service.carregueProntuario(path);
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
