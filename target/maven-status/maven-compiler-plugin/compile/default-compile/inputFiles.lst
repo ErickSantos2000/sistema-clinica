@@ -1,5 +1,10 @@
-C:\Users\caian\Downloads\RefatoracaoClinica\RefatoracaoClinica\src\main\java\Procedimento.java
-C:\Users\caian\Downloads\RefatoracaoClinica\RefatoracaoClinica\src\main\java\TipoLeito.java
-C:\Users\caian\Downloads\RefatoracaoClinica\RefatoracaoClinica\src\main\java\Prontuario.java
-C:\Users\caian\Downloads\RefatoracaoClinica\RefatoracaoClinica\src\main\java\Internacao.java
-C:\Users\caian\Downloads\RefatoracaoClinica\RefatoracaoClinica\src\main\java\TipoProcedimento.java
+/home/erick/Downloads/Clinica/src/main/java/factory/ProcedimentoFactory.java
+/home/erick/Downloads/Clinica/src/main/java/model/TipoLeito.java
+/home/erick/Downloads/Clinica/src/main/java/model/internacao/Internacao.java
+/home/erick/Downloads/Clinica/src/main/java/model/procedimentos/Procedimento.java
+/home/erick/Downloads/Clinica/src/main/java/model/procedimentos/ProcedimentoAvancado.java
+/home/erick/Downloads/Clinica/src/main/java/model/procedimentos/ProcedimentoBasico.java
+/home/erick/Downloads/Clinica/src/main/java/model/procedimentos/ProcedimentoComum.java
+/home/erick/Downloads/Clinica/src/main/java/model/prontuario/Prontuario.java
+/home/erick/Downloads/Clinica/src/main/java/repository/ProntuarioRepository.java
+/home/erick/Downloads/Clinica/src/main/java/service/ProntuarioService.java

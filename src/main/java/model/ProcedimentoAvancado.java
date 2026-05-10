@@ -1,4 +1,5 @@
 package model;
+
 public class ProcedimentoAvancado implements Procedimento{
     @Override
     public float getValor() {

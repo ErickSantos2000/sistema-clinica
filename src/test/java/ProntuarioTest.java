@@ -7,8 +7,9 @@ import model.Procedimento;
 import model.ProcedimentoAvancado;
 import model.ProcedimentoBasico;
 import model.ProcedimentoComum;
-import model.Prontuario;
 import model.TipoLeito;
+import model.Prontuario;
+import repository.ProntuarioRepository;
 import service.ProntuarioService;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class ProntuarioTest {
 
 	@Before
 	public void setUp() {
-		service = new ProntuarioService();
+		service = new ProntuarioService(new ProntuarioRepository());
 	}
 
 	@After

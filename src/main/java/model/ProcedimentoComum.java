@@ -1,4 +1,5 @@
 package model;
+
 public class ProcedimentoComum implements Procedimento {
     @Override
     public float getValor() {

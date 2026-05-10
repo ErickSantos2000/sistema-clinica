@@ -1,6 +1,1 @@
-TipoLeito.class
-Internacao.class
-Prontuario.class
-Procedimento.class
-TipoProcedimento.class
-Prontuario$1.class
+service/ProntuarioService$1.class
