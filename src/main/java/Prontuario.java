@@ -11,7 +11,8 @@ public class Prontuario {
 
 	private String nomePaciente;
 	private Internacao internacao;
-	private Set<Procedimento> procedimentos = new HashSet<>();
+	private List<Procedimento> procedimentos = new ArrayList<>();
+	private ProcedimentoFactory procedimentoFactory = new ProcedimentoFactory();
 
 	public Prontuario(String nomePaciente) {
 		this.nomePaciente = nomePaciente;
@@ -37,7 +38,7 @@ public class Prontuario {
 		this.procedimentos.add(procedimento);
 	}
 
-	public Set<Procedimento> getProcedimentos() {
+	public List<Procedimento> getProcedimentos() {
 		return this.procedimentos;
 	}
 
@@ -49,6 +50,7 @@ public class Prontuario {
 		float valorDiarias = 0.0f;
 
 		// Contabilizar as diárias
+		// ==== utilizar polimorfimos aqui
 		if (internacao != null) {
 			switch (internacao.getTipoLeito()) {
 				case ENFERMARIA:
@@ -73,28 +75,29 @@ public class Prontuario {
 		}
 
 		float valorTotalProcedimentos = 0.00f;
-		int qtdeProcedimentosBasicos = 0;
-		int qtdeProcedimentosComuns = 0;
-		int qtdeProcedimentosAvancados = 0;
 
 		//Contabiliza os procedimentos
+		// ==== utilizar polimorfimos aqui
 		for (Procedimento procedimento : procedimentos) {
-			switch (procedimento.getTipoProcedimento()) {
-				case BASICO:
-					qtdeProcedimentosBasicos++;
-					valorTotalProcedimentos += 50.00;
-					break;
+			// uso do polimorfismo
+			valorTotalProcedimentos += procedimento.getValor();	
 
-				case COMUM:
-					qtdeProcedimentosComuns++;
-					valorTotalProcedimentos += 150.00;
-					break;
+			// switch (procedimento.getTipoProcedimento()) {
+			// 	case BASICO:
+			// 		qtdeProcedimentosBasicos++;
+			// 		valorTotalProcedimentos += procedimento.getVa;
+			// 		break;
 
-				case AVANCADO:
-					qtdeProcedimentosAvancados++;
-					valorTotalProcedimentos += 500.00;
-					break;
-			}
+			// 	case COMUM:
+			// 		qtdeProcedimentosComuns++;
+			// 		valorTotalProcedimentos += 150.00;
+			// 		break;
+
+			// 	case AVANCADO:
+			// 		qtdeProcedimentosAvancados++;
+			// 		valorTotalProcedimentos += 500.00;
+			// 		break;
+			// }
 		}
 
 		conta += "\nA conta do(a) paciente " + nomePaciente + " tem valor total de __ " + formatter.format(valorDiarias + valorTotalProcedimentos) + " __";
@@ -109,22 +112,73 @@ public class Prontuario {
 		if (procedimentos.size() > 0) {
 			conta += "\n\nValor Total Procedimentos:\t\t" + formatter.format(valorTotalProcedimentos);
 
-			if (qtdeProcedimentosBasicos > 0) {
-				conta += "\n\t\t\t\t\t" + qtdeProcedimentosBasicos + " procedimento" + (qtdeProcedimentosBasicos > 1 ? "s" : "")
-						+ " básico" + (qtdeProcedimentosBasicos > 1 ? "s" : "");
-			}
+			// usa a lista de procedimentos pra fazer agrupamento por tipo
+			Map<String, List<Procedimento>> grupos = procedimentos.stream()
+				.collect(
+					Collectors.groupingBy(
+						// define o criterio de agrupamento pelo tipo 
+						Procedimento::getTipo, 			
+						// como HashMap comum não garante a ordem das chaves
+						// ao usar LinkedHashMap garante que os grupos apareçam na mesma ordem em que foram inseridos
+						LinkedHashMap::new,    
+						// diz que em cada balde do mapa, eu quero um List com todos os objs
+						Collectors.toList()
+					));
 
-			if (qtdeProcedimentosComuns > 0) {
-				conta += "\n\t\t\t\t\t" + qtdeProcedimentosComuns + " procedimento" + (qtdeProcedimentosComuns > 1 ? "s" : "")
-						+ " comu" + (qtdeProcedimentosComuns > 1 ? "ns" : "m");
-			}
+			// grupos.keySet() pega o nome de todos os grupos	
+			for (String tipo : grupos.keySet()) {
+				List<Procedimento> listaDoTipo = grupos.get(tipo); // entra no balde e tira a lista de procedimetos
+				int qtd = listaDoTipo.size(); // descobre quantos procedimentos daquele tipo existem
+				// pega o primeiro procedimento da lista 
+				Procedimento exemplo = listaDoTipo.get(0); 
+				// uso do polimorfismo
+				conta += exemplo.imprimeRelatorio(qtd);
 
-			if (qtdeProcedimentosAvancados > 0) {
-				conta += "\n\t\t\t\t\t" + qtdeProcedimentosAvancados + " procedimento" + (qtdeProcedimentosBasicos > 1 ? "s" : "")
-						+ " avançado" + (qtdeProcedimentosAvancados > 1 ? "s" : "");
+				// conta += "\n\nValor Total Procedimentos:\t\t" + formatter.format(valorTotalProcedimentos);
+
+				// if (qtdeProcedimentosBasicos > 0) {
+				// 	conta += "\n\t\t\t\t\t" + qtdeProcedimentosBasicos + " procedimento" + (qtdeProcedimentosBasicos > 1 ? "s" : "")
+				// 			+ " básico" + (qtdeProcedimentosBasicos > 1 ? "s" : "");
+				// }
+
+				// if (qtdeProcedimentosComuns > 0) {
+				// 	conta += "\n\t\t\t\t\t" + qtdeProcedimentosComuns + " procedimento" + (qtdeProcedimentosComuns > 1 ? "s" : "")
+				// 			+ " comu" + (qtdeProcedimentosComuns > 1 ? "ns" : "m");
+				// }
+
+				// if (qtdeProcedimentosAvancados > 0) {
+				// 	conta += "\n\t\t\t\t\t" + qtdeProcedimentosAvancados + " procedimento" + (qtdeProcedimentosBasicos > 1 ? "s" : "")
+				// 			+ " avançado" + (qtdeProcedimentosAvancados > 1 ? "s" : "");
+				// }
+
+				// ======= (OUTRA FORMA DE FAZER) ========
+				// 	if (procedimentos.size() > 0) {
+				// conta += "\n\nValor Total Procedimentos:\t\t" + formatter.format(valorTotalProcedimentos);
+
+				// // usa a lista de procedimentos pra fazer agrupamento por tipo
+				// Map<String, Long> contagem = procedimentos.stream()
+				// 	.collect(Collectors.groupingBy(
+				// 		Procedimento::getTipo, 
+				// 		LinkedHashMap:: new,
+				// 		Collectors.counting()
+				// 	));
+
+				// 	for (String tipo : contagem.keySet()) {
+				// 		long qtd = contagem.get(tipo);
+
+				// 		// Buscamos qualquer procedimento que tenha essa descrição para usar seu método de formatar
+				// 		Procedimento exemplo = procedimentos.stream()
+				// 			.filter(p -> p.getTipo().equals(tipo))
+				// 			.findFirst()
+				// 			.get();
+
+				// 		conta += exemplo.imprimeRelatorio((int) qtd);
+				// 	}
+				// }
+
 			}
 		}
-
+		
 		conta += "\n\nVolte sempre, a casa é sua!";
 		conta += "\n----------------------------------------------------------------------------------------------";
 
@@ -133,11 +187,15 @@ public class Prontuario {
 
 	boolean b = false;
 
+	// ==== DEVE FICAR EM UMA CLASSE DE REPOSITORIO
 	public Prontuario carregueProntuario(String arquivoCsv) throws IOException {
 		Prontuario prontuario = new Prontuario(null);
-
+		
+		// passa o caminho do arquivo CSV
 		Path path = Paths.get(arquivoCsv);
 
+		// transforma o CSV em uma Stream de Strings
+		// Files.lines(path) instrui a Stream ler o arquivo linha por linha
 		Stream<String> linhas = Files.lines(path);
 
 		linhas.forEach((str) -> {
@@ -154,7 +212,7 @@ public class Prontuario {
 
 				int qtdeDiasInternacao = dados[2] != null && !dados[2].trim().isEmpty() ? Integer.parseInt(dados[2].trim()) : -1;
 
-				TipoProcedimento tipoProcedimento = dados[3] != null && !dados[3].trim().isEmpty() ? TipoProcedimento.valueOf(dados[3].trim()) : null;
+				String tipoProcedimento = dados[3] != null && !dados[3].trim().isEmpty() ? dados[3].trim() : null;
 
 				int qtdeProcedimentos = dados.length == 5 && dados[4] != null && !dados[4].trim().isEmpty() ? Integer.parseInt(dados[4].trim()) : -1;
 
@@ -166,7 +224,7 @@ public class Prontuario {
 
 				if (tipoProcedimento != null && qtdeProcedimentos > 0) {
 					while (qtdeProcedimentos > 0) {
-						prontuario.addProcedimento(new Procedimento(tipoProcedimento));
+						prontuario.addProcedimento(procedimentoFactory.criaProcedimento(tipoProcedimento));
 						qtdeProcedimentos--;
 					}
 				}
@@ -176,6 +234,7 @@ public class Prontuario {
 		return prontuario;
 	}
 
+	// ==== DEVE FICAR EM UMA CLASSE DE REPOSITORIO
 	List<String> l = new ArrayList<>();
 
 	public String salveProntuario() throws IOException {
@@ -190,13 +249,13 @@ public class Prontuario {
 		}
 
 		if (procedimentos.size() > 0) {
-			Map<TipoProcedimento, Long> procedimentosAgrupados = procedimentos.stream().collect(
-					Collectors.groupingBy(Procedimento::getTipoProcedimento, Collectors.counting()));
+			Map<String, Long> procedimentosAgrupados = procedimentos.stream().collect(
+					Collectors.groupingBy(Procedimento::getTipo, Collectors.counting()));
 
-			List<TipoProcedimento> procedimentosOrdenados = new ArrayList<>(procedimentosAgrupados.keySet());
+			List<String> procedimentosOrdenados = new ArrayList<>(procedimentosAgrupados.keySet());
 			Collections.sort(procedimentosOrdenados);
 
-			for (TipoProcedimento chave : procedimentosOrdenados) {
+			for (String chave : procedimentosOrdenados) {
 				String l2 = nomePaciente + ",,," + chave + "," + procedimentosAgrupados.get(chave);
 				l.add(l2);
 			}
