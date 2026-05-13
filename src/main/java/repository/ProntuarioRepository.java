@@ -11,15 +11,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import factory.LeitoFactory;
 import factory.ProcedimentoFactory;
 import model.Internacao;
 import model.Procedimento;
-import model.TipoLeito;
 import model.Prontuario;
 
 public class ProntuarioRepository {
 
     private ProcedimentoFactory procedimentoFactory = new ProcedimentoFactory();
+	private LeitoFactory leitoFactory = new LeitoFactory();
 
     public ProntuarioRepository(){
 
@@ -48,7 +49,7 @@ public class ProntuarioRepository {
 
 				String nomePaciente = dados[0].trim();
 
-				TipoLeito tipoLeito = dados[1] != null && !dados[1].trim().isEmpty() ? TipoLeito.valueOf(dados[1].trim()) : null;
+				String tipoLeito = dados[1] != null && !dados[1].trim().isEmpty() ? dados[1].trim() : null;
 
 				int qtdeDiasInternacao = dados[2] != null && !dados[2].trim().isEmpty() ? Integer.parseInt(dados[2].trim()) : -1;
 
@@ -59,7 +60,7 @@ public class ProntuarioRepository {
 				prontuario.setNomePaciente(nomePaciente);
 
 				if (tipoLeito != null && qtdeDiasInternacao > 0) {
-					prontuario.setInternacao(new Internacao(tipoLeito, qtdeDiasInternacao));
+					prontuario.setInternacao(new Internacao(leitoFactory.criaLeito(tipoLeito), qtdeDiasInternacao));
 				}
 
 				if (tipoProcedimento != null && qtdeProcedimentos > 0) {
@@ -92,7 +93,7 @@ public class ProntuarioRepository {
 
 		if (procedimentos.size() > 0) {
 			Map<String, Long> procedimentosAgrupados = procedimentos.stream().collect(
-					Collectors.groupingBy(Procedimento::getTipo, Collectors.counting()));
+					Collectors.groupingBy(Procedimento::getTipoProcedimento, Collectors.counting()));
 
 			List<String> procedimentosOrdenados = new ArrayList<>(procedimentosAgrupados.keySet());
 			Collections.sort(procedimentosOrdenados);

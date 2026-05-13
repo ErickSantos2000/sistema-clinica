@@ -2,20 +2,34 @@ package model;
 
 public class Internacao {
 
-	private TipoLeito tipoLeito;
+	private Leito leito;
 	private int qtdeDias;
 
-	public Internacao(TipoLeito tipoLeito, int qtdeDias) {
-		this.tipoLeito = tipoLeito;
+	public Internacao(Leito leito, int qtdeDias) {
+		this.leito = leito;
 		this.qtdeDias = qtdeDias;
 	}
 
-	public TipoLeito getTipoLeito() {
-		return tipoLeito;
+	// metodo para contabilizar diaria,Internacao precisa se comunicar diretamente com leito
+	public float contabilizaDiaria(){
+		return leito.getValorLeito(qtdeDias);
 	}
 
-	public void setTipoLeito(TipoLeito tipoLeito) {
-		this.tipoLeito = tipoLeito;
+	// metodo para pegar tipo de leito, Internacao precisa se comunicar diretamente com leito
+	public String getTipoLeito(){
+		return leito.getTipoLeito();
+	}
+
+	public String relatorioLeito(){
+		return leito.relatorioLeito(qtdeDias);
+	}
+
+	public Leito getleito() {
+		return leito;
+	}
+
+	public void setleito(Leito leito) {
+		this.leito = leito;
 	}
 
 	public int getQtdeDias() {

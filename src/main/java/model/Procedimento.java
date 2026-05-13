@@ -1,7 +1,7 @@
 package model;
 
 public interface Procedimento {
-	public abstract float getValor();
-	public abstract String getTipo(); 
-	public abstract String imprimeRelatorio(int quantidade);
+	public abstract float getValorProcedimento();
+	public abstract String getTipoProcedimento(); 
+	public abstract String relatorioProcedimentos(int quantidade);
 }

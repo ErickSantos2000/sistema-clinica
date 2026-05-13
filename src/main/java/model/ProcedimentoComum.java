@@ -2,12 +2,12 @@ package model;
 
 public class ProcedimentoComum implements Procedimento {
     @Override
-    public float getValor() {
+    public float getValorProcedimento() {
         return 150.00f;
     }
 
     @Override
-    public String imprimeRelatorio(int quantidade) {
+    public String relatorioProcedimentos(int quantidade) {
         if (quantidade > 0) {
 		    return "\n\t\t\t\t\t" + quantidade + " procedimento" + (quantidade > 1 ? "s" : "") + " comu" + (quantidade > 1 ? "ns" : "m");
             }
@@ -16,7 +16,7 @@ public class ProcedimentoComum implements Procedimento {
     }
 
     @Override
-    public String getTipo() {
+    public String getTipoProcedimento() {
         return "COMUM";
     }
 }

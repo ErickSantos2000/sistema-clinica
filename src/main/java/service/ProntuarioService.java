@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import model.Internacao;
 import model.Procedimento;
-import model.TipoLeito;
 import model.Prontuario;
 import repository.ProntuarioRepository;
 
@@ -32,26 +31,27 @@ public class ProntuarioService {
 		// Contabilizar as diárias
 		// ==== utilizar polimorfimos aqui
 		if (internacao != null) {
-			switch (internacao.getTipoLeito()) {
-				case ENFERMARIA:
-					if (internacao.getQtdeDias() <= 3) {
-						valorDiarias += 40.00 * internacao.getQtdeDias(); // Internação Básica
-					} else if (internacao.getQtdeDias() <= 8) {
-						valorDiarias += 35.00 * internacao.getQtdeDias(); // Internação Média
-					} else {
-						valorDiarias += 30.00 * internacao.getQtdeDias(); // Internação Grave
-					}
-					break;
-				case APARTAMENTO:
-					if (internacao.getQtdeDias() <= 3) {
-						valorDiarias += 100.00 * internacao.getQtdeDias(); // Internação Básica
-					} else if (internacao.getQtdeDias() <= 8) {
-						valorDiarias += 90.00 * internacao.getQtdeDias();  // Internação Média
-					} else {
-						valorDiarias += 80.00 * internacao.getQtdeDias();  // Internação Grave
-					}
-					break;
-			}
+			valorDiarias += internacao.contabilizaDiaria();
+			// switch (internacao.getTipoLeito()) {
+			// 	case ENFERMARIA:
+			// 		if (internacao.getQtdeDias() <= 3) {
+			// 			valorDiarias += 40.00 * internacao.getQtdeDias(); // Internação Básica
+			// 		} else if (internacao.getQtdeDias() <= 8) {
+			// 			valorDiarias += 35.00 * internacao.getQtdeDias(); // Internação Média
+			// 		} else {
+			// 			valorDiarias += 30.00 * internacao.getQtdeDias(); // Internação Grave
+			// 		}
+			// 		break;
+			// 	case APARTAMENTO:
+			// 		if (internacao.getQtdeDias() <= 3) {
+			// 			valorDiarias += 100.00 * internacao.getQtdeDias(); // Internação Básica
+			// 		} else if (internacao.getQtdeDias() <= 8) {
+			// 			valorDiarias += 90.00 * internacao.getQtdeDias();  // Internação Média
+			// 		} else {
+			// 			valorDiarias += 80.00 * internacao.getQtdeDias();  // Internação Grave
+			// 		}
+			// 		break;
+			// }
 		}
 
 		float valorTotalProcedimentos = 0.00f;
@@ -60,7 +60,7 @@ public class ProntuarioService {
 		// ==== utilizar polimorfimos aqui
 		for (Procedimento procedimento : procedimentos) {
 			// uso do polimorfismo
-			valorTotalProcedimentos += procedimento.getValor();	
+			valorTotalProcedimentos += procedimento.getValorProcedimento();	
 
 			// switch (procedimento.getTipoProcedimento()) {
 			// 	case BASICO:
@@ -85,9 +85,12 @@ public class ProntuarioService {
 
 		if (internacao != null) {
 			conta += "\n\nValor Total Diárias:\t\t\t" + formatter.format(valorDiarias);
-			conta += "\n\t\t\t\t\t" + internacao.getQtdeDias() + " diária" + (internacao.getQtdeDias() > 1 ? "s" : "")
-					+ " em " + (internacao.getTipoLeito() == TipoLeito.APARTAMENTO ? "apartamento" : "enfermaria");
+			conta += internacao.relatorioLeito();
+
+			// conta += "\n\t\t\t\t\t" + internacao.getQtdeDias() + " diária" + (internacao.getQtdeDias() > 1 ? "s" : "")
+			// + " em " + (internacao.getTipoLeito() == TipoLeito.APARTAMENTO ? "apartamento" : "enfermaria");
 		}
+		
 
 		if (procedimentos.size() > 0) {
 			conta += "\n\nValor Total Procedimentos:\t\t" + formatter.format(valorTotalProcedimentos);
@@ -97,7 +100,7 @@ public class ProntuarioService {
 				.collect(
 					Collectors.groupingBy(
 						// define o criterio de agrupamento pelo tipo 
-						Procedimento::getTipo, 			
+						Procedimento::getTipoProcedimento, 			
 						// como HashMap comum não garante a ordem das chaves
 						// ao usar LinkedHashMap garante que os grupos apareçam na mesma ordem em que foram inseridos
 						LinkedHashMap::new,    
@@ -112,7 +115,7 @@ public class ProntuarioService {
 				// pega o primeiro procedimento da lista 
 				Procedimento exemplo = listaDoTipo.get(0); 
 				// uso do polimorfismo
-				conta += exemplo.imprimeRelatorio(qtd);
+				conta += exemplo.relatorioProcedimentos(qtd);
 
 				// conta += "\n\nValor Total Procedimentos:\t\t" + formatter.format(valorTotalProcedimentos);
 
